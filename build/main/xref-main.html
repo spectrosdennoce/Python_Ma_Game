@@ -15,10 +15,11 @@
 
 <div class="node">
   <a name="main.py"></a>
-  <a target="code" href="///C:/Users/mikai/Desktop/magame/main.py" type="text/plain"><tt>main.py</tt></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/main.py" type="text/plain"><tt>main.py</tt></a>
 <span class="moduletype">Script</span>  <div class="import">
 imports:
     <a href="#Game.Game">Game.Game</a>
+ &#8226;   <a href="#Game.Menu">Game.Menu</a>
  &#8226;   <a href="#_bootlocale">_bootlocale</a>
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
@@ -374,16 +375,17 @@ imported by:
 
 <div class="node">
   <a name="Entity.Bullet"></a>
-  <a target="code" href="///C:/Users/mikai/Desktop/magame/Entity/Bullet.py" type="text/plain"><tt>Entity.Bullet</tt></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Entity/Bullet.py" type="text/plain"><tt>Entity.Bullet</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#Entity">Entity</a>
+ &#8226;   <a href="#Entity.Entity">Entity.Entity</a>
  &#8226;   <a href="#pygame">pygame</a>
 
   </div>
   <div class="import">
 imported by:
-    <a href="#Entity.Entity">Entity.Entity</a>
+    <a href="#Game.Game">Game.Game</a>
 
   </div>
 
@@ -391,7 +393,7 @@ imported by:
 
 <div class="node">
   <a name="Entity.Enemy"></a>
-  <a target="code" href="///C:/Users/mikai/Desktop/magame/Entity/Enemy.py" type="text/plain"><tt>Entity.Enemy</tt></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Entity/Enemy.py" type="text/plain"><tt>Entity.Enemy</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#Entity">Entity</a>
@@ -408,17 +410,17 @@ imported by:
 
 <div class="node">
   <a name="Entity.Entity"></a>
-  <a target="code" href="///C:/Users/mikai/Desktop/magame/Entity/Entity.py" type="text/plain"><tt>Entity.Entity</tt></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Entity/Entity.py" type="text/plain"><tt>Entity.Entity</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#Entity">Entity</a>
- &#8226;   <a href="#Entity.Bullet">Entity.Bullet</a>
  &#8226;   <a href="#pygame">pygame</a>
 
   </div>
   <div class="import">
 imported by:
-    <a href="#Entity.Enemy">Entity.Enemy</a>
+    <a href="#Entity.Bullet">Entity.Bullet</a>
+ &#8226;   <a href="#Entity.Enemy">Entity.Enemy</a>
  &#8226;   <a href="#Entity.Personage">Entity.Personage</a>
 
   </div>
@@ -427,7 +429,7 @@ imported by:
 
 <div class="node">
   <a name="Entity.Personage"></a>
-  <a target="code" href="///C:/Users/mikai/Desktop/magame/Entity/Personage.py" type="text/plain"><tt>Entity.Personage</tt></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Entity/Personage.py" type="text/plain"><tt>Entity.Personage</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
     <a href="#Entity">Entity</a>
@@ -447,7 +449,31 @@ imported by:
   <a target="code" href="-" type="text/plain"><tt>Game</tt></a>
 <span class="moduletype">NamespacePackage</span>  <div class="import">
 imported by:
+    <a href="#Game.Display_Config">Game.Display_Config</a>
+ &#8226;   <a href="#Game.Game">Game.Game</a>
+ &#8226;   <a href="#Game.Menu">Game.Menu</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Game.Display_Config"></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Game/Display_Config.py" type="text/plain"><tt>Game.Display_Config</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Game">Game</a>
+ &#8226;   <a href="#Level.Level">Level.Level</a>
+ &#8226;   <a href="#configparser">configparser</a>
+ &#8226;   <a href="#glob">glob</a>
+ &#8226;   <a href="#pygame">pygame</a>
+ &#8226;   <a href="#pygame.mixer">pygame.mixer</a>
+
+  </div>
+  <div class="import">
+imported by:
     <a href="#Game.Game">Game.Game</a>
+ &#8226;   <a href="#Game.Menu">Game.Menu</a>
 
   </div>
 
@@ -455,19 +481,64 @@ imported by:
 
 <div class="node">
   <a name="Game.Game"></a>
-  <a target="code" href="///C:/Users/mikai/Desktop/magame/Game/Game.py" type="text/plain"><tt>Game.Game</tt></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Game/Game.py" type="text/plain"><tt>Game.Game</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#Entity.Enemy">Entity.Enemy</a>
+    <a href="#Entity.Bullet">Entity.Bullet</a>
+ &#8226;   <a href="#Entity.Enemy">Entity.Enemy</a>
  &#8226;   <a href="#Entity.Personage">Entity.Personage</a>
  &#8226;   <a href="#Game">Game</a>
- &#8226;   <a href="#configparser">configparser</a>
- &#8226;   <a href="#pygame">pygame</a>
+ &#8226;   <a href="#Game.Display_Config">Game.Display_Config</a>
 
   </div>
   <div class="import">
 imported by:
     <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Game.Menu"></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Game/Menu.py" type="text/plain"><tt>Game.Menu</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Game">Game</a>
+ &#8226;   <a href="#Game.Display_Config">Game.Display_Config</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Level"></a>
+  <a target="code" href="-" type="text/plain"><tt>Level</tt></a>
+<span class="moduletype">NamespacePackage</span>  <div class="import">
+imported by:
+    <a href="#Level.Level">Level.Level</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="Level.Level"></a>
+  <a target="code" href="///C:/Users/mikai/Desktop/Python_Ma_Game/Level/Level.py" type="text/plain"><tt>Level.Level</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Level">Level</a>
+ &#8226;   <a href="#pygame">pygame</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#Game.Display_Config">Game.Display_Config</a>
 
   </div>
 
@@ -3220,7 +3291,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#Game.Game">Game.Game</a>
+    <a href="#Game.Display_Config">Game.Display_Config</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
 
   </div>
@@ -7190,7 +7261,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#PyInstaller.building.build_main">PyInstaller.building.build_main</a>
+    <a href="#Game.Display_Config">Game.Display_Config</a>
+ &#8226;   <a href="#PyInstaller.building.build_main">PyInstaller.building.build_main</a>
  &#8226;   <a href="#PyInstaller.building.utils">PyInstaller.building.utils</a>
  &#8226;   <a href="#PyInstaller.depend.bindepend">PyInstaller.depend.bindepend</a>
  &#8226;   <a href="#PyInstaller.depend.imphook">PyInstaller.depend.imphook</a>
@@ -10358,7 +10430,8 @@ imports:
 imported by:
     <a href="#Entity.Bullet">Entity.Bullet</a>
  &#8226;   <a href="#Entity.Entity">Entity.Entity</a>
- &#8226;   <a href="#Game.Game">Game.Game</a>
+ &#8226;   <a href="#Game.Display_Config">Game.Display_Config</a>
+ &#8226;   <a href="#Level.Level">Level.Level</a>
  &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#pygame._freetype">pygame._freetype</a>
  &#8226;   <a href="#pygame._numpysndarray">pygame._numpysndarray</a>
@@ -10793,7 +10866,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#pygame">pygame</a>
+    <a href="#Game.Display_Config">Game.Display_Config</a>
+ &#8226;   <a href="#pygame">pygame</a>
  &#8226;   <a href="#pygame._numpysndarray">pygame._numpysndarray</a>
 
   </div>

@@ -1,4 +1,4 @@
-from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level
+from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level,glob
 from Entity.Personage import Personnage
 from Entity.Enemy import Enemy
 from Entity.Bullet import Bullet
@@ -8,7 +8,7 @@ class Game(Display_Interface):
         #init music
         mixer.music.load(r"./Music/songamu1.mp3")
         mixer.music.set_volume(0.2)
-        #mixer.music.play(-1)
+        mixer.music.play(-1)
         self.Rythme = 1200
         self.BPM = 60
         self.milliseconds_until_event = self.Rythme
@@ -19,13 +19,18 @@ class Game(Display_Interface):
         Image_Bullet = [pygame.image.load(r"./Image/Bullet.png")]
         Image_Mob1 = [pygame.image.load(r"./Image/mob.png"),pygame.image.load(r"./Image/mob1.png"),pygame.image.load(r"./Image/mob2.png")]
         Image_Mob2 = [pygame.image.load(r"./Image/mobground1.png"),pygame.image.load(r"./Image/mobground2.png")]
+        Image_Mob3_Raw = glob.glob(r"./Image/ship_v2/*.png")
+        Image_Mob3 = []
+        for x in Image_Mob3_Raw:
+            Image_Mob3 += [pygame.image.load(x)]
         Sfx = pygame.mixer.Sound(r"./sfx/gun.wav")
         #init player
         self.Player = Personnage(Image=Image_Player,Game=self,Position_Bullet_X=50,Position_Bullet_Y=20,Shoot_Entity=Bullet(Image_Bullet,self,Sfx))
         #init enemy
         self.Enemy = [
         Enemy(Image=Image_Mob1,Game=self,Position_Bullet_X=0,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx),Pos_X=self.SCREEN_WIDTH-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3),
-        Enemy(Image=Image_Mob2,Position_Bullet_X=0,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx),Pos_X=self.SCREEN_WIDTH/2-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3)
+        Enemy(Image=Image_Mob2,Position_Bullet_X=0,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx),Pos_X=self.SCREEN_WIDTH/2-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3),
+        Enemy(Image=Image_Mob3,Position_Bullet_X=0,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx),Pos_X=self.SCREEN_WIDTH-self.SCREEN_WIDTH/2,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3)
         ]
         #init Level
         self.Level = [Level(Image_Bg_Lvl1,self)]
