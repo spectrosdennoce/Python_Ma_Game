@@ -1,11 +1,13 @@
 from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level
+from Libs.Read_Raw import raw,Get_All_From_Folder
 class Menu(Display_Interface):
     def __init__(self):
         super().__init__()
         
         #get_Ressource
         self.Display.fill((0,0,0))
-        Image_Bg = [pygame.image.load(r"./Image/Menu_Title_Bg_Play.png"),pygame.image.load(r"./Image/Menu_Title_Bg_Options.png"),pygame.image.load(r"./Image/Menu_Title_Bg_Quit.png")]
+        
+        Image_Bg = Get_All_From_Folder("./Image/Menu/",".png")
         self.Level = [Level(Image_Bg,self)]
 
     def HandleEvent(self):
