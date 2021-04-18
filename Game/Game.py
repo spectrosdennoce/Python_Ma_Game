@@ -99,7 +99,7 @@ class Game(Display_Interface):
             if(Enemy_unique.Vie == 10):
                 self.Display.blit(Enemy_unique.Get_Image(),(Enemy_unique.Pos_X, Enemy_unique.Pos_Y))
             else:
-                self.Display.blit(Enemy_unique.Mask[Enemy_unique.Etat%len(Enemy_unique.Image)].to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(Enemy_unique.Pos_X, Enemy_unique.Pos_Y))
+                self.Display.blit(Enemy_unique.Sprite[Enemy_unique.Etat%len(Enemy_unique.Image)].mask.to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(Enemy_unique.Pos_X, Enemy_unique.Pos_Y))
         
             if (Enemy_unique.Is_Shooting == True) & (Enemy_unique.Is_Animate == False):
                     self.Display.blit(Enemy_unique.Shoot_Entity.Get_Image(),(Enemy_unique.Shoot_Entity.Pos_X, Enemy_unique.Shoot_Entity.Pos_Y))
@@ -108,10 +108,10 @@ class Game(Display_Interface):
                     else:
                         Enemy_unique.Is_Shooting = False
 
-        if (self.Player.Is_Shooting == True) & (self.Player.Is_Animate == False):
+        if (self.Player.Is_Shooting == True) & (self.Player.Is_Animate == False) & (self.Player.Shoot_Entity.Has_Hit == False):
             if(self.Player.Shoot_Entity.Reverse == False):
                 self.Display.blit(self.Player.Shoot_Entity.Get_Image(),(self.Player.Shoot_Entity.Pos_X, self.Player.Shoot_Entity.Pos_Y))
-                self.Display.blit(self.Player.Shoot_Entity.Mask[self.Player.Etat%len(self.Player.Image)].to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(self.Player.Shoot_Entity.Pos_X, self.Player.Shoot_Entity.Pos_Y))
+                self.Display.blit(self.Player.Shoot_Entity.Sprite[self.Player.Etat%len(self.Player.Image)].mask.to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(self.Player.Shoot_Entity.Pos_X, self.Player.Shoot_Entity.Pos_Y))
         
                 if self.Player.Shoot_Entity.Pos_X < self.SCREEN_WIDTH:
                     self.Player.Shoot_Entity.Pos_X += self.Player.Shoot_Entity.Vitesse
@@ -119,18 +119,42 @@ class Game(Display_Interface):
                     self.Player.Is_Shooting = False
             else:
                 self.Display.blit(self.Player.Shoot_Entity.Get_Image(),(self.Player.Shoot_Entity.Pos_X-self.Player.Size_X, self.Player.Shoot_Entity.Pos_Y))
-                self.Display.blit(self.Player.Shoot_Entity.Mask[self.Player.Etat%len(self.Player.Image)].to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(self.Player.Shoot_Entity.Pos_X-self.Player.Size_X, self.Player.Shoot_Entity.Pos_Y))
-        
-        
+                self.Display.blit(self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].mask.to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(self.Player.Shoot_Entity.Pos_X-self.Player.Size_X, self.Player.Shoot_Entity.Pos_Y))
                 if self.Player.Shoot_Entity.Pos_X > 0:
                     self.Player.Shoot_Entity.Pos_X -= self.Player.Shoot_Entity.Vitesse
                 else:
                     self.Player.Is_Shooting = False
-        #if pygame.sprite.spritecollide(self.Player, self.Enemy, False, pygame.sprite.collide_mask):
-         #   print("colide")
         #get image du joueur
         self.Display.blit(self.Player.Get_Image(),(self.Player.Pos_X, self.Player.Pos_Y))
-        self.Display.blit(self.Player.Mask[self.Player.Etat%len(self.Player.Image)].to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(self.Player.Pos_X, self.Player.Pos_Y))
+        self.Display.blit(self.Player.Sprite[self.Player.Etat%len(self.Player.Image)].mask.to_surface(surface=None, setsurface=None, unsetsurface=None, setcolor=(255, 0, 0, 255), unsetcolor=(0, 0, 0, 0)),(self.Player.Pos_X, self.Player.Pos_Y))
         
+        #offset enemy | player WIP TEST A MONTER DANS LA BOUCLE ENEMY
+        offset= (self.Enemy[0].Sprite[self.Enemy[0].Etat%len(self.Enemy[0].Image)].rect.x  -  self.Player.Sprite[self.Player.Etat%len(self.Player.Image)].rect.x,
+         self.Enemy[0].Sprite[self.Enemy[0].Etat%len(self.Enemy[0].Image)].rect.y - self.Player.Sprite[self.Player.Etat%len(self.Player.Image)].rect.y)
+
+        #collider player | enemy0 WIP TEST A MONTER DANS LA BOUCLE ENEMY
+        if self.Player.Sprite[self.Player.Etat%len(self.Player.Image)].mask.overlap(self.Enemy[0].Sprite[self.Enemy[0].Etat%len(self.Enemy[0].Image)].mask,offset):
+            print('The two masks overlap!')
+
+        if (self.Player.Is_Shooting == True) & (self.Player.Shoot_Entity.Has_Hit == False):
+            number_enemy = 0
+            offset= (self.Enemy[number_enemy].Sprite[self.Enemy[number_enemy].Etat%len(self.Enemy[number_enemy].Image)].rect.x  -  self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].rect.x,
+            self.Enemy[number_enemy].Sprite[self.Enemy[number_enemy].Etat%len(self.Enemy[number_enemy].Image)].rect.y - self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].rect.y)
+            if (self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].mask.overlap(self.Enemy[number_enemy].Sprite[self.Enemy[number_enemy].Etat%len(self.Enemy[number_enemy].Image)].mask,offset)):
+                print('The two masks overlap!'+ str(number_enemy) + " : " +  str(self.Enemy[number_enemy].Vie))
+                self.Player.Shoot_Entity.Has_Hit = True
+            else:
+                self.Player.Shoot_Entity.Has_Hit = False
+            number_enemy = 1
+
+            offset= (self.Enemy[number_enemy].Sprite[self.Enemy[number_enemy].Etat%len(self.Enemy[number_enemy].Image)].rect.x  -  self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].rect.x,
+            self.Enemy[number_enemy].Sprite[self.Enemy[number_enemy].Etat%len(self.Enemy[number_enemy].Image)].rect.y - self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].rect.y)
+            if (self.Player.Shoot_Entity.Sprite[self.Player.Shoot_Entity.Etat%len(self.Player.Shoot_Entity.Image)].mask.overlap(self.Enemy[number_enemy].Sprite[self.Enemy[number_enemy].Etat%len(self.Enemy[number_enemy].Image)].mask,offset)):
+                if (self.Player.Shoot_Entity.Has_Hit == False):
+                    print('The two masks overlap!'+ str(number_enemy) + " : " +  str(self.Enemy[number_enemy].Vie))
+                    self.Enemy[number_enemy].Vie = self.Enemy[number_enemy].Vie - 1
+                    self.Player.Shoot_Entity.Has_Hit = True
+                else:
+                    self.Player.Shoot_Entity.Has_Hit = False
         self.milliseconds_since_event += pygame.time.Clock().tick(self.frames_per_second)
         pygame.display.flip()

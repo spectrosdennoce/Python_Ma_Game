@@ -5,19 +5,21 @@ class Entity():
         self.Size_Y = Size_Y
         self.Size_X = Size_X
         self.Image = []
-        self.Mask = []
+        self.Sprite = []
         self.Reverse = Reverse
+        self.Pos_Y = Pos_Y
+        self.Pos_X = Pos_X
         for x in Image:
+            imagex = pygame.image.load(x)
             x = pygame.transform.scale(
-                        pygame.image.load(x),
+                        pygame.image.load(x).convert_alpha(),
                         (self.Size_X,self.Size_Y)
                         )
             if(self.Reverse == True):
                 x = pygame.transform.flip(x,True,False)
-            self.Mask += [pygame.mask.from_surface(x)]
+            self.Sprite += [Sprite(x,Pos_X,Pos_Y)]
             self.Image += [x]
-        self.Pos_Y = Pos_Y
-        self.Pos_X = Pos_X
+            
         self.Vitesse = Vitesse
         self.Can_Shoot = Can_Shoot
         self.Is_Action = False
@@ -47,10 +49,12 @@ class Entity():
         self.Shoot_Entity.Sfx.play().set_volume(0.1)
     def Get_Image(self):
         x = self.Image[self.Etat%len(self.Image)]
-        self.Mask[self.Etat%len(self.Image)] = pygame.mask.from_surface(x)
+        #sprite
+        self.Sprite[self.Etat%len(self.Image)].Refresh_Sprite(x,self.Pos_X,self.Pos_Y)
         if(self.Reverse == True):
             x = pygame.transform.flip(x,True,False)
-            self.Mask[self.Etat%len(self.Image)] = pygame.mask.from_surface(x)
+            #sprite
+            self.Sprite[self.Etat%len(self.Image)].Refresh_Sprite(x,self.Pos_X,self.Pos_Y)
             if(self.Shoot_Entity is not None) & (self.Is_Shooting == False):
                 self.Shoot_Entity.Reverse = True
         else:
@@ -69,3 +73,12 @@ class Entity():
             self.Pos_X -= self.Vitesse
         elif  (self.Pos_X < 0):
             self.Pos_X = 0
+
+class Sprite(pygame.sprite.Sprite):
+    def __init__(self,Image,Pos_X,Pos_Y):
+        self.Refresh_Sprite(Image,Pos_X,Pos_Y)
+    
+    def Refresh_Sprite(self,Image,Pos_X,Pos_Y):
+        self.image = Image
+        self.rect = pygame.Rect(self.image.get_rect(topleft=(Pos_X,Pos_Y)))
+        self.mask = pygame.mask.from_surface(self.image)
