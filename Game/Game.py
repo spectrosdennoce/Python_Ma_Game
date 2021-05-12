@@ -19,18 +19,11 @@ class Game(Display_Interface):
         Image_Mob3 = Get_All_From_Folder("./Image/Mob/Ship/",".png")
         
         ##get_sound
+        
+        Music = [raw("./Music/songamu1.mp3")]
         Sfx = raw("./sfx/gun.wav")
 
-    #init music
-        mixer.music.load(r"./Music/songamu1.mp3")
-        mixer.music.set_volume(self.Music_Volume)
-        if(self.Debug == False):
-            mixer.music.play(-1)
-        self.Rythme = 1200
-        self.BPM = 60
-        self.milliseconds_until_event = self.Rythme
-        self.milliseconds_since_event = 0
-
+    
     #init player
         self.Player = Personnage(Image=Image_Player,Game=self,Position_Bullet_X=80,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx))
 
@@ -44,6 +37,15 @@ class Game(Display_Interface):
     #init Level
         self.Level = [Level(Image_Bg_Lvl1,self)]
 
+    #init music
+        mixer.music.load(Music[self.Player.Level])
+        mixer.music.set_volume(self.Music_Volume)
+        if(self.Debug == False):
+            mixer.music.play(-1)
+        self.Rythme = 1200
+        self.BPM = 60
+        self.milliseconds_until_event = self.Rythme
+        self.milliseconds_since_event = 0
     #init Controler
     def HandleEvent(self):
         height_ground = self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/4
@@ -71,19 +73,32 @@ class Game(Display_Interface):
             self.Player.Goto_Left()
 
         if (keys[getattr(pygame, "K_"+self.TOUCHE["space"])]) & (self.Player.Is_Shooting == False) & (self.Player.Is_Action == True):
-            self.Player.Shoot(True)
+            self.Player.Is_Away_Shot = True
 
     #init Rythme_based
     def Rythme_fonc(self):
-        if ((self.milliseconds_since_event >= self.milliseconds_until_event-self.BPM)):
+
+        if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed)) & (self.Player.Is_Away_Shot == True) & (self.Player.Has_Shoot == False)):
+            
+            self.Player.Animate(1,3,True,lambda:self.Player.Shoot())
+            if(self.Player.Etat == 0):
+                self.Player.Is_Away_Shot = False
+
+        if (self.milliseconds_since_event >= self.milliseconds_until_event-self.BPM):
             self.Player.Is_Action = True
-            if self.milliseconds_since_event >= self.milliseconds_until_event+self.BPM/2:
+            self.Player.Has_Shoot = False
+
+            if self.milliseconds_since_event >= (self.milliseconds_until_event+self.BPM):
                 self.milliseconds_since_event = 0
                 for Enemy_unique in self.Enemy:
                     if(Enemy_unique.Can_Shoot == True):
                         Enemy_unique.Shoot()
                 self.Player.Is_Action = False
+                
+
+            
             self.milliseconds_until_event = self.Rythme
+        
       
     #init Update
     def Update(self):
@@ -99,8 +114,8 @@ class Game(Display_Interface):
 
         for Enemy_unique in self.Enemy:
             #collider player | enemy_list WIP TEST A MONTER DANS LA BOUCLE ENEMY
-            #if(self.Debug):
-                #print(str(self.Player.Is_Shooting) + " - " + str(self.Player.Is_Action))
+            # if(self.Debug):
+            #     print(str(self.Player.Is_Shooting) + " - " + str(self.Player.Is_Action))
             if self.Player.IS_Overlaps(Enemy_unique):
                 print('Player collide enemy!' + " : " +  str(Enemy_unique.Vie))
             
@@ -121,10 +136,10 @@ class Game(Display_Interface):
                 for Player_Bullet in self.Player.Bullet:
                     if Player_Bullet.IS_Overlaps(Enemy_unique):
                         self.Player.Bullet.remove(Player_Bullet)
-                        Enemy_unique.Vie = Enemy_unique.Vie - 1
+                        self.Player.Is_Shooting = False
+                        Enemy_unique.Vie = Enemy_unique.Vie - Player_Bullet.Degat
                         if(self.Debug):
                             print('player bullet collide enemy' + " : " +  str(Enemy_unique.Vie))
-
 
 #--------------------------------------------------------------------------------------
 
@@ -147,7 +162,7 @@ class Game(Display_Interface):
 #--------------------------------------------------------------------------------------
 
         #print bullet
-        if (self.Player.Is_Shooting == True) & (self.Player.Is_Animate == False):
+        if (self.Player.Is_Shooting == True):
             for Player_Bullet in self.Player.Bullet:
                 if(Player_Bullet.Reverse == False):
                     #show player bullet image

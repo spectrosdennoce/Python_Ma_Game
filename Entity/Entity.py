@@ -24,6 +24,11 @@ class Entity():
         self.Is_Action = False
         self.Is_Shooting = False
         self.Is_Animate = False
+        self.Animation_Reverse = False
+        self.Is_Away_Shot = False
+        self.Has_Shoot = False
+        self.frames = 0
+        self.Speed = 400
         self.Max_Vie = Vie
         self.Vie = Vie
         self.Etat = 0
@@ -32,24 +37,37 @@ class Entity():
         self.Position_Bullet_Y = Position_Bullet_Y
         self.Position_Bullet_X = Position_Bullet_X
 
-    def Shoot(self,Reverse = False):
+    def Animate(self,Min_Plage,Max_Plage,Reverse = False,function_unleash = None):
+        
+        if(self.Has_Shoot == False):
+            self.Is_Animate = True
+
+        if ((self.Animation_Reverse == False) & (self.Etat == Max_Plage)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
+            self.Etat = 0
+            self.Is_Animate = False
+            self.Has_Shoot = True
+            self.Animation_Reverse = False
+        
+        if(self.Game.Debug == True):
+            print("Is_Animate : " + str(self.Is_Animate))
+        if(self.Is_Animate):
+            if(self.Etat+Min_Plage > Max_Plage):
+                function_unleash()
+            if(self.Etat+Min_Plage <= Max_Plage) & (self.Animation_Reverse == False):
+                if(self.Etat+Min_Plage == Max_Plage):
+                    self.Animation_Reverse = Reverse
+                self.Etat += 1
+            elif (self.Etat > Min_Plage) & (self.Animation_Reverse == True):
+                self.Etat -= 1
+                
+        if(self.Game.Debug == True):
+            print("Etat : " + str(self.Etat))
+
+    def Shoot(self):
         self.Shoot_Entity.Get_Image()
         self.Shoot_Entity.Pos_Y = self.Pos_Y + self.Position_Bullet_Y
         self.Shoot_Entity.Pos_X = self.Pos_X + self.Position_Bullet_X
-        self.Etat = 0
         self.Is_Shooting = True
-        self.Is_Animate = True
-        while (self.Etat < len(self.Sprite)):
-            self.Etat = self.Etat+1
-            self.Game.HandleEvent()
-            self.Game.Update()
-        if(Reverse == True):
-            while (self.Etat > 0):
-                self.Etat = self.Etat-1
-                self.Game.HandleEvent()
-                self.Game.Update()
-                
-        self.Is_Animate = False
         try:
             self.Shoot_Entity.Sfx.play().set_volume(self.Game.SFX_Volume)
         except:

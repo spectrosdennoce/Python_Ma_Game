@@ -26,7 +26,7 @@ class Display_Interface:
             }
             self.Write_all_Config('Klavier',self.TOUCHE)
         #init display
-        self.Debug = True
+        self.Debug = False
         self.Running = True
         try:
             Screen_config = self.get_Config('Ecran')
