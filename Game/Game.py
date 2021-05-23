@@ -79,10 +79,16 @@ class Game(Display_Interface):
     def Rythme_fonc(self):
 
         if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed)) & (self.Player.Is_Away_Shot == True) & (self.Player.Has_Shoot == False)):
-            
-            self.Player.Animate(1,3,True,lambda:self.Player.Shoot())
+            self.milliseconds_since_event = 0
+            self.Player.Animate(1,3,False,lambda:self.Player.Shoot())
             if(self.Player.Etat == 0):
                 self.Player.Is_Away_Shot = False
+            
+            for Enemy_unique in self.Enemy:
+                if(Enemy_unique.Can_Shoot == True):
+                    #Enemy_unique.Shoot()
+                    Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
+            self.Player.Is_Action = False
 
         if (self.milliseconds_since_event >= self.milliseconds_until_event-self.BPM):
             self.Player.Is_Action = True
@@ -96,7 +102,6 @@ class Game(Display_Interface):
                 self.Player.Is_Action = False
                 
 
-            
             self.milliseconds_until_event = self.Rythme
         
       

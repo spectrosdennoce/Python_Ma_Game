@@ -42,7 +42,7 @@ class Entity():
         if(self.Has_Shoot == False):
             self.Is_Animate = True
 
-        if ((self.Animation_Reverse == False) & (self.Etat == Max_Plage)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
+        if ((self.Animation_Reverse == False) & (self.Etat+Min_Plage > Max_Plage)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
             self.Etat = 0
             self.Is_Animate = False
             self.Has_Shoot = True
