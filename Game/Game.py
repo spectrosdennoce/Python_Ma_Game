@@ -48,7 +48,6 @@ class Game(Display_Interface):
         self.milliseconds_since_event = 0
     #init Controler
     def HandleEvent(self):
-        height_ground = self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/4
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.Running = False
@@ -56,15 +55,13 @@ class Game(Display_Interface):
         if keys[getattr(pygame, "K_"+self.TOUCHE["escape"])]:
             self.Running = False
 
-        if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Pos_Y > 0):
-            self.Player.Pos_Y -= self.Player.Vitesse
-        elif keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Pos_Y < 0):
-            self.Player.Pos_Y = 0
+        if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Is_Jump == False):
+            self.Player.Is_Jump = True
 
-        if keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y < self.SCREEN_HEIGHT):
-            self.Player.Pos_Y += self.Player.Vitesse
-        elif keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y > self.SCREEN_HEIGHT):
-            self.Player.Pos_Y = self.SCREEN_HEIGHT-self.Player.Size_Y
+        # if keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y < self.SCREEN_HEIGHT):
+        #     self.Player.Pos_Y += self.Player.Vitesse
+        # elif keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y > self.SCREEN_HEIGHT):
+        #     self.Player.Pos_Y = self.SCREEN_HEIGHT-self.Player.Size_Y
 
         if keys[getattr(pygame, "K_"+self.TOUCHE["droite"])]:
             self.Player.Goto_Right()
@@ -80,15 +77,15 @@ class Game(Display_Interface):
 
         if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed)) & (self.Player.Is_Away_Shot == True) & (self.Player.Has_Shoot == False)):
             self.milliseconds_since_event = 0
-            self.Player.Animate(1,3,False,lambda:self.Player.Shoot())
+            self.Player.Animate(1,3,True,lambda:self.Player.Shoot())
             if(self.Player.Etat == 0):
                 self.Player.Is_Away_Shot = False
             
-            for Enemy_unique in self.Enemy:
-                if(Enemy_unique.Can_Shoot == True):
-                    #Enemy_unique.Shoot()
-                    Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
             self.Player.Is_Action = False
+            # for Enemy_unique in self.Enemy:
+            #     if(Enemy_unique.Can_Shoot == True):
+            #         #Enemy_unique.Shoot()
+            #         Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
 
         if (self.milliseconds_since_event >= self.milliseconds_until_event-self.BPM):
             self.Player.Is_Action = True
@@ -98,10 +95,8 @@ class Game(Display_Interface):
                 self.milliseconds_since_event = 0
                 for Enemy_unique in self.Enemy:
                     if(Enemy_unique.Can_Shoot == True):
-                        Enemy_unique.Shoot()
+                        Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
                 self.Player.Is_Action = False
-                
-
             self.milliseconds_until_event = self.Rythme
         
       
@@ -165,6 +160,9 @@ class Game(Display_Interface):
                         Enemy_unique.Bullet.remove(Enemy_Bullet)
 
 #--------------------------------------------------------------------------------------
+        #check jump player
+        if(self.Player.Is_Jump == True):
+            self.Player.jump()
 
         #print bullet
         if (self.Player.Is_Shooting == True):
@@ -177,6 +175,7 @@ class Game(Display_Interface):
                         #show player bullet masque
                         if(self.Debug):
                             self.Display.blit(Player_Bullet.Get_Mask_Surface(),Player_Bullet.Get_Pos())
+                            pygame.draw.rect(self.Display,(255,255,0,255),Player_Bullet.Get_Rect())
                     else:
                         self.Player.Bullet.remove(Player_Bullet)
                         self.Player.Is_Shooting = False
@@ -184,10 +183,11 @@ class Game(Display_Interface):
                     #show player bullet image
                     if (Player_Bullet.Pos_X > 0):
                         Player_Bullet.Pos_X -= Player_Bullet.Vitesse
-                        self.Display.blit(Player_Bullet.Get_Image(),(Player_Bullet.Pos_X-self.Player.Size_X, Player_Bullet.Pos_Y))
+                        self.Display.blit(Player_Bullet.Get_Image(),Player_Bullet.Get_Rect())
                         #show  player bullet masque
                         if(self.Debug):
-                            self.Display.blit(Player_Bullet.Get_Mask_Surface(),(Player_Bullet.Pos_X-self.Player.Size_X, Player_Bullet.Pos_Y))
+                            self.Display.blit(Player_Bullet.Get_Mask_Surface(),Player_Bullet.Get_Rect())
+                            pygame.draw.rect(self.Display,(255,255,0,255),Player_Bullet.Get_Rect())
                     else:
                         self.Player.Bullet.remove(Player_Bullet)
                         self.Player.Is_Shooting = False

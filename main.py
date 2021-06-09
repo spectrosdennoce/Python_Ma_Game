@@ -6,7 +6,6 @@ from Game.Menu import Menu
 #ne pas oublier le dossier ini image Music et sfx avec le exe
 menu_object = Menu()
 game_object = Game()
-
 while menu_object.Running:
     menu_object.HandleEvent()
     menu_object.Update()

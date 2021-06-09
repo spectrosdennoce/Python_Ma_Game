@@ -4,6 +4,9 @@ class Level:
         self.Difficulte = 0
         self.Scrolling_Speed = 2
         self.Etat = 0
+        self.Gravity = 0.5
+    #init level floor
+        self.Height_Ground = Game.SCREEN_HEIGHT-300
         self.Image_Level= []
         for x in Image:
             self.Image_Level += [

@@ -28,7 +28,7 @@ class Entity():
         self.Is_Away_Shot = False
         self.Has_Shoot = False
         self.frames = 0
-        self.Speed = 400
+        self.Speed = 100
         self.Max_Vie = Vie
         self.Vie = Vie
         self.Etat = 0
@@ -36,13 +36,13 @@ class Entity():
         self.Bullet = []
         self.Position_Bullet_Y = Position_Bullet_Y
         self.Position_Bullet_X = Position_Bullet_X
-
+    #premiere image, derniere image,si l'animation apres l'action ce rejoue a l'envers, la fonction apres avoir atteint la derniere image
     def Animate(self,Min_Plage,Max_Plage,Reverse = False,function_unleash = None):
         
         if(self.Has_Shoot == False):
             self.Is_Animate = True
 
-        if ((self.Animation_Reverse == False) & (self.Etat+Min_Plage > Max_Plage)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
+        if ((self.Animation_Reverse == False) & (self.Etat+Min_Plage > Max_Plage+1)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
             self.Etat = 0
             self.Is_Animate = False
             self.Has_Shoot = True
@@ -53,7 +53,7 @@ class Entity():
         if(self.Is_Animate):
             if(self.Etat+Min_Plage > Max_Plage):
                 function_unleash()
-            if(self.Etat+Min_Plage <= Max_Plage) & (self.Animation_Reverse == False):
+            if(self.Etat+Min_Plage <= Max_Plage+1) & (self.Animation_Reverse == False):
                 if(self.Etat+Min_Plage == Max_Plage):
                     self.Animation_Reverse = Reverse
                 self.Etat += 1
@@ -66,7 +66,10 @@ class Entity():
     def Shoot(self):
         self.Shoot_Entity.Get_Image()
         self.Shoot_Entity.Pos_Y = self.Pos_Y + self.Position_Bullet_Y
-        self.Shoot_Entity.Pos_X = self.Pos_X + self.Position_Bullet_X
+        if(self.Reverse):
+            self.Shoot_Entity.Pos_X = self.Pos_X + (self.Position_Bullet_X - self.Position_Bullet_X)
+        else:
+            self.Shoot_Entity.Pos_X = self.Pos_X + self.Position_Bullet_X
         self.Is_Shooting = True
         try:
             self.Shoot_Entity.Sfx.play().set_volume(self.Game.SFX_Volume)
