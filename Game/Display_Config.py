@@ -13,20 +13,22 @@ class Display_Interface:
         #init controler
         try:
             self.TOUCHE = self.get_Config('Klavier')
+            print(self.TOUCHE)
         except:
             print('cannot open Klvaier')
             self.TOUCHE = {
-            'Haut':'z',
-            'Bas':'s',
-            'Gauche':'q',
-            'Droite':'d',
-            'Space':'SPACE',
-            'Escape':'ESCAPE',
-            'Enter':'RETURN'
+            'haut':'z',
+            'bas':'s',
+            'gauche':'q',
+            'droite':'d',
+            'space':'SPACE',
+            'escape':'ESCAPE',
+            'enter':'RETURN'
             }
+            print(self.TOUCHE)
             self.Write_all_Config('Klavier',self.TOUCHE)
         #init display
-        self.Debug = True
+        self.Debug = False
         self.Running = True
         try:
             Screen_config = self.get_Config('Ecran')

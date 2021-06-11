@@ -1,7 +1,7 @@
 import pygame
 class Sprite(pygame.sprite.Sprite):
     def __init__(self,Image,Entity):
-        pygame.sprite.Sprite.__init__(self) 
+        pygame.sprite.Sprite.__init__(self)
         self.Refresh_Sprite(Image,Entity)
 
     def Refresh_Sprite(self,Image,Entity):

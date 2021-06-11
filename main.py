@@ -5,15 +5,16 @@ from Game.Menu import Menu
 #pyinstaller --onefile --noconsole .\main.py
 #ne pas oublier le dossier ini image Music et sfx avec le exe
 menu_object = Menu()
-game_object = Game()
 while menu_object.Running:
-    menu_object.HandleEvent()
     menu_object.Update()
+    menu_object.HandleEvent()
+
+game_object = Game()
 while game_object.Running:
     game_object.HandleEvent()
     game_object.Rythme_fonc()
     game_object.Update()
-pygame.quit()
+exit()
 
 
 

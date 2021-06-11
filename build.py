@@ -2,7 +2,7 @@ import PyInstaller.__main__
 import os
 import shutil
 #compile en exe
-pyinstaller.__main__.run([
+PyInstaller.__main__.run([
 	'.\main.py',
 	'--onefile',
 	'--icon=image/icon.ico',
@@ -12,12 +12,12 @@ pyinstaller.__main__.run([
 ])
 
 #copie ressource to dist
-srcImage = './Image'
-srcsfx = './sfx'
-srcMusic = './Music'
+
 dest = './dist/'
-shutil.copytree(srcImage, dest + "Image") 
-shutil.copytree(srcsfx, dest + "sfx")
-shutil.copytree(srcMusic, dest + "Music")
+Repe = ["Image","sfx","Music"]
+for x in Repe:
+	if(os.path.exists(dest+x)):
+		shutil.rmtree( dest + x)
+	shutil.copytree("./"+x+"/", dest + x)
 #zip to send
 shutil.make_archive('Tempo_of_Psycho', 'zip', './dist')

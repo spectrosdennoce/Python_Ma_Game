@@ -1,4 +1,5 @@
 from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level,glob
+import random
 from Libs.Read_Raw import raw,Get_All_From_Folder
 from Entity.Personage import Personnage
 from Entity.Enemy import Enemy
@@ -26,18 +27,21 @@ class Game(Display_Interface):
     
     #init player
         self.Player = Personnage(Image=Image_Player,Game=self,Position_Bullet_X=80,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx))
-
+    #init spawner
+        self.Spawner = (self.SCREEN_WIDTH-100,self.SCREEN_HEIGHT-350)
     #init enemy
-        self.Enemy = [
-        Enemy(Image=Image_Mob1,Game=self,Vie=9,Position_Bullet_X=0,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.SCREEN_WIDTH-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/1.5),
-        Enemy(Image=Image_Mob2,Position_Bullet_X=0,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.SCREEN_WIDTH/2-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3),
-        Enemy(Image=Image_Mob3,Position_Bullet_X=0,Position_Bullet_Y=89,Game=self,Shoot_Entity=Bullet(Image_Laser,self,Sfx),Pos_X=self.SCREEN_WIDTH-self.SCREEN_WIDTH/2,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/2)
+        self.Enemy_Type = [
+            Enemy(Image=Image_Mob1,Game=self,Vie=2,Position_Bullet_X=0,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.Spawner[0],Pos_Y=self.Spawner[1]),
+            Enemy(Image=Image_Mob2,Position_Bullet_X=0,Vie=2,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.SCREEN_WIDTH/2-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3),
+            Enemy(Image=Image_Mob3,Position_Bullet_X=0,Vie=2,Position_Bullet_Y=89,Game=self,Shoot_Entity=Bullet(Image_Laser,self,Sfx),Pos_X=self.SCREEN_WIDTH-self.SCREEN_WIDTH/2,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/2)
         ]
+        self.Enemy = [self.Enemy_Type[0],self.Enemy_Type[1],self.Enemy_Type[2]]
 
     #init Level
         self.Level_Right = Level(Image_Bg_Lvl1,self,-self.SCREEN_WIDTH)
         self.Level_Left = Level(Image_Bg_Lvl1,self,self.SCREEN_WIDTH)
         self.Level = [Level(Image_Bg_Lvl1,self)]
+
     #init music
         mixer.music.load(Music[self.Player.Level])
         mixer.music.set_volume(self.Music_Volume)
@@ -102,6 +106,17 @@ class Game(Display_Interface):
             #     if(Enemy_unique.Can_Shoot == True):
             #         #Enemy_unique.Shoot()
             #         Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
+        
+        for Enemy_unique in self.Enemy:
+            if ((self.milliseconds_since_event_shooter >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Shoot)) & (Enemy_unique.Is_Away_Shot == True) & (Enemy_unique.Has_Shoot == False)):
+                        self.milliseconds_since_event_shooter = 0
+                        Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
+                        self.Has_Shoot = True
+                        if(Enemy_unique.Etat == 0):
+                            Enemy_unique.Is_Away_Shot = False
+                        
+                        Enemy_unique.Is_Action = False
+
 
         if (self.milliseconds_since_event_shooter >= self.milliseconds_until_event-self.BPM):
             self.Player.Is_Action = True
@@ -110,8 +125,8 @@ class Game(Display_Interface):
             if self.milliseconds_since_event_shooter >= (self.milliseconds_until_event+self.BPM):
                 self.milliseconds_since_event_shooter = 0
                 for Enemy_unique in self.Enemy:
-                    if(Enemy_unique.Can_Shoot == True):
-                        Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
+                    Enemy_unique.Is_Away_Shot = True
+                    Enemy_unique.Etat = 0
                 self.Player.Is_Action = False
             self.milliseconds_until_event = self.Rythme
         
@@ -129,9 +144,14 @@ class Game(Display_Interface):
 #--------------------------------------------------------------------------------------
 
         for Enemy_unique in self.Enemy:
-            #collider player | enemy_list WIP TEST A MONTER DANS LA BOUCLE ENEMY
-            # if(self.Debug):
-            #     print(str(self.Player.Is_Shooting) + " - " + str(self.Player.Is_Action))
+            if(len(self.Enemy) < 4):
+                randomized_mod = random.randint(1,3)
+                if randomized_mod == 1:
+                    self.Enemy.append(self.Enemy_Type[0])
+                elif randomized_mod == 2:
+                    self.Enemy.append(self.Enemy_Type[1])
+                elif randomized_mod == 3:
+                    self.Enemy.append(self.Enemy_Type[2])
             if self.Player.IS_Overlaps(Enemy_unique):
                 print('Player collide enemy!' + " : " +  str(Enemy_unique.Vie))
             
@@ -141,6 +161,7 @@ class Game(Display_Interface):
             if (Enemy_unique.Is_Shooting == True):
                 for Enemy_Bullet in Enemy_unique.Bullet:
                     if Enemy_Bullet.IS_Overlaps(self.Player):
+                        self.Player.Vie -= Enemy_Bullet.Degat
                         Enemy_unique.Bullet.remove(Enemy_Bullet)
                         if(self.Debug):
                             print('enemy bullet collide player')

@@ -2,7 +2,7 @@ import pygame
 import copy
 from Libs.Sprite import Sprite
 class Entity():
-    def __init__(self,Image,Game,Reverse=False,Shoot_Entity=None,Position_Bullet_X=None,Position_Bullet_Y=None,Size_X=200,Size_Y=300,Pos_X=250,Pos_Y=250,Vitesse=10,Can_Shoot=False,Vie=3):
+    def __init__(self,Image,Game,Reverse=False,Shoot_Entity=None,Position_Bullet_X=None,Position_Bullet_Y=None,Size_X=100,Size_Y=200,Pos_X=250,Pos_Y=250,Vitesse=10,Can_Shoot=False,Vie=3):
         self.Game = Game
         self.Size_Y = Size_Y
         self.Size_X = Size_X
@@ -98,11 +98,7 @@ class Entity():
 
     def Goto_Left(self):
         self.Reverse = True
-        if self.IS_Overlaps(self.Game.Level_Right):
-            print("True")
-            self.Pos_X = 0
-        else:
-            print("False")
+        if not self.IS_Overlaps(self.Game.Level_Right):
             self.Pos_X -= self.Vitesse
         # if  (self.Pos_X > 0):
         #     self.Pos_X -= self.Vitesse
@@ -116,11 +112,7 @@ class Entity():
         # elif (self.Pos_X+self.Size_X > self.Game.SCREEN_WIDTH):
         #     self.Pos_X = self.Game.SCREEN_WIDTH-self.Size_X
         
-        if self.IS_Overlaps(self.Game.Level_Left):
-            print("True")
-            self.Pos_X = self.Game.SCREEN_WIDTH - self.Size_X 
-        else:
-            print("False")
+        if not self.IS_Overlaps(self.Game.Level_Left):
             self.Pos_X += self.Vitesse
 
     def Get_Sprite(self):
