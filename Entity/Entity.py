@@ -1,7 +1,8 @@
 import pygame
 import copy
+from Libs.Sprite import Sprite
 class Entity():
-    def __init__(self,Image,Game,Reverse=False,Shoot_Entity=None,Position_Bullet_X=None,Position_Bullet_Y=None,Size_X=100,Size_Y=200,Pos_X=250,Pos_Y=250,Vitesse=10,Can_Shoot=False,Vie=3):
+    def __init__(self,Image,Game,Reverse=False,Shoot_Entity=None,Position_Bullet_X=None,Position_Bullet_Y=None,Size_X=200,Size_Y=300,Pos_X=250,Pos_Y=250,Vitesse=10,Can_Shoot=False,Vie=3):
         self.Game = Game
         self.Size_Y = Size_Y
         self.Size_X = Size_X
@@ -28,7 +29,10 @@ class Entity():
         self.Is_Away_Shot = False
         self.Has_Shoot = False
         self.frames = 0
-        self.Speed = 100
+        self.Speed_Shoot = 100
+        self.Speed_Jump = 155
+        self.Speed_Move = 155
+        self.Is_Move = False
         self.Max_Vie = Vie
         self.Vie = Vie
         self.Etat = 0
@@ -41,28 +45,28 @@ class Entity():
         
         if(self.Has_Shoot == False):
             self.Is_Animate = True
-
+        
         if ((self.Animation_Reverse == False) & (self.Etat+Min_Plage > Max_Plage+1)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
             self.Etat = 0
             self.Is_Animate = False
-            self.Has_Shoot = True
             self.Animation_Reverse = False
-        
         if(self.Game.Debug == True):
             print("Is_Animate : " + str(self.Is_Animate))
         if(self.Is_Animate):
+            if((self.Etat == 0) & (self.Animation_Reverse == False)):
+                self.Etat = Min_Plage
             if(self.Etat+Min_Plage > Max_Plage):
-                function_unleash()
+                if(function_unleash):
+                    function_unleash()
             if(self.Etat+Min_Plage <= Max_Plage+1) & (self.Animation_Reverse == False):
                 if(self.Etat+Min_Plage == Max_Plage):
                     self.Animation_Reverse = Reverse
                 self.Etat += 1
             elif (self.Etat > Min_Plage) & (self.Animation_Reverse == True):
                 self.Etat -= 1
-                
         if(self.Game.Debug == True):
             print("Etat : " + str(self.Etat))
-
+    
     def Shoot(self):
         self.Shoot_Entity.Get_Image()
         self.Shoot_Entity.Pos_Y = self.Pos_Y + self.Position_Bullet_Y
@@ -94,17 +98,30 @@ class Entity():
 
     def Goto_Left(self):
         self.Reverse = True
-        if  (self.Pos_X > 0):
-            self.Pos_X -= self.Vitesse
-        elif  (self.Pos_X < 0):
+        if self.IS_Overlaps(self.Game.Level_Right):
+            print("True")
             self.Pos_X = 0
+        else:
+            print("False")
+            self.Pos_X -= self.Vitesse
+        # if  (self.Pos_X > 0):
+        #     self.Pos_X -= self.Vitesse
+        # elif  (self.Pos_X < 0):
+        #     self.Pos_X = 0
 
     def Goto_Right(self):
         self.Reverse = False
-        if (self.Pos_X+self.Size_X < self.Game.SCREEN_WIDTH):
+        # if (self.Pos_X+self.Size_X < self.Game.SCREEN_WIDTH):
+        #     self.Pos_X += self.Vitesse
+        # elif (self.Pos_X+self.Size_X > self.Game.SCREEN_WIDTH):
+        #     self.Pos_X = self.Game.SCREEN_WIDTH-self.Size_X
+        
+        if self.IS_Overlaps(self.Game.Level_Left):
+            print("True")
+            self.Pos_X = self.Game.SCREEN_WIDTH - self.Size_X 
+        else:
+            print("False")
             self.Pos_X += self.Vitesse
-        elif (self.Pos_X+self.Size_X > self.Game.SCREEN_WIDTH):
-            self.Pos_X = self.Game.SCREEN_WIDTH-self.Size_X
 
     def Get_Sprite(self):
         return self.Sprite[self.Etat%len(self.Sprite)]
@@ -127,13 +144,3 @@ class Entity():
     def IS_Overlaps(self,other):
         return (self.Get_Mask().overlap(other.Get_Mask(),self.Get_Offset(other)))
         
-
-class Sprite(pygame.sprite.Sprite):
-    def __init__(self,Image,Entity):
-        pygame.sprite.Sprite.__init__(self) 
-        self.Refresh_Sprite(Image,Entity)
-
-    def Refresh_Sprite(self,Image,Entity):
-        self.image = Image
-        self.rect = pygame.Rect(self.image.get_rect(topleft=(Entity.Pos_X,Entity.Pos_Y)))
-        self.mask = pygame.mask.from_surface(self.image)

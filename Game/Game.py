@@ -35,8 +35,9 @@ class Game(Display_Interface):
         ]
 
     #init Level
+        self.Level_Right = Level(Image_Bg_Lvl1,self,-self.SCREEN_WIDTH)
+        self.Level_Left = Level(Image_Bg_Lvl1,self,self.SCREEN_WIDTH)
         self.Level = [Level(Image_Bg_Lvl1,self)]
-
     #init music
         mixer.music.load(Music[self.Player.Level])
         mixer.music.set_volume(self.Music_Volume)
@@ -46,6 +47,7 @@ class Game(Display_Interface):
         self.BPM = 60
         self.milliseconds_until_event = self.Rythme
         self.milliseconds_since_event = 0
+        self.milliseconds_since_event_shooter = 0
     #init Controler
     def HandleEvent(self):
         for event in pygame.event.get():
@@ -56,28 +58,42 @@ class Game(Display_Interface):
             self.Running = False
 
         if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Is_Jump == False):
-            self.Player.Is_Jump = True
+            self.Player.Is_Away_Jump = True
 
         # if keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y < self.SCREEN_HEIGHT):
         #     self.Player.Pos_Y += self.Player.Vitesse
         # elif keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y > self.SCREEN_HEIGHT):
         #     self.Player.Pos_Y = self.SCREEN_HEIGHT-self.Player.Size_Y
 
-        if keys[getattr(pygame, "K_"+self.TOUCHE["droite"])]:
+        if (keys[getattr(pygame, "K_"+self.TOUCHE["droite"])]) & (self.Player.Is_Shooting == False) & ((self.Player.Is_Away_Shot == False) ):
+            self.Player.Is_Move = True
             self.Player.Goto_Right()
 
-        if keys[getattr(pygame, "K_"+self.TOUCHE["gauche"])]:
+        if (keys[getattr(pygame, "K_"+self.TOUCHE["gauche"])]) & (self.Player.Is_Shooting == False) & ((self.Player.Is_Away_Shot == False) ):
+            self.Player.Is_Move = True
             self.Player.Goto_Left()
 
         if (keys[getattr(pygame, "K_"+self.TOUCHE["space"])]) & (self.Player.Is_Shooting == False) & (self.Player.Is_Action == True):
             self.Player.Is_Away_Shot = True
+            self.Player.Etat = 0
 
     #init Rythme_based
     def Rythme_fonc(self):
-
-        if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed)) & (self.Player.Is_Away_Shot == True) & (self.Player.Has_Shoot == False)):
+        
+        if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Jump)) & (self.Player.Is_Away_Jump == True)):
             self.milliseconds_since_event = 0
+            self.Player.Animate(4,12,True,lambda:self.Player.Set_Jump())
+
+        if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Jump)) & (self.Player.Is_Move == True)):
+            self.milliseconds_since_event = 0
+            if(self.Player.Is_Jump == False) & (self.Player.Is_Away_Jump == False):
+                self.Player.Animate(12,24,False)
+                self.Player.Is_Move = False
+
+        if ((self.milliseconds_since_event_shooter >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Shoot)) & (self.Player.Is_Away_Shot == True) & (self.Player.Has_Shoot == False)):
+            self.milliseconds_since_event_shooter = 0
             self.Player.Animate(1,3,True,lambda:self.Player.Shoot())
+            self.Has_Shoot = True
             if(self.Player.Etat == 0):
                 self.Player.Is_Away_Shot = False
             
@@ -87,12 +103,12 @@ class Game(Display_Interface):
             #         #Enemy_unique.Shoot()
             #         Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
 
-        if (self.milliseconds_since_event >= self.milliseconds_until_event-self.BPM):
+        if (self.milliseconds_since_event_shooter >= self.milliseconds_until_event-self.BPM):
             self.Player.Is_Action = True
             self.Player.Has_Shoot = False
 
-            if self.milliseconds_since_event >= (self.milliseconds_until_event+self.BPM):
-                self.milliseconds_since_event = 0
+            if self.milliseconds_since_event_shooter >= (self.milliseconds_until_event+self.BPM):
+                self.milliseconds_since_event_shooter = 0
                 for Enemy_unique in self.Enemy:
                     if(Enemy_unique.Can_Shoot == True):
                         Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
@@ -107,7 +123,7 @@ class Game(Display_Interface):
         #set image fonction level
         self.Display.blit(self.Level[self.Player.Level].Get_Image(),(0, 0))
         #set purple rect
-        if ((self.milliseconds_since_event >= self.milliseconds_until_event-self.BPM)):
+        if ((self.milliseconds_since_event_shooter >= self.milliseconds_until_event-self.BPM)):
             pygame.draw.rect(self.Display,(255,0,255),pygame.Rect(self.SCREEN_WIDTH-100,self.SCREEN_HEIGHT-100,self.SCREEN_WIDTH,self.SCREEN_HEIGHT))
 
 #--------------------------------------------------------------------------------------
@@ -186,8 +202,8 @@ class Game(Display_Interface):
                         self.Display.blit(Player_Bullet.Get_Image(),Player_Bullet.Get_Rect())
                         #show  player bullet masque
                         if(self.Debug):
-                            self.Display.blit(Player_Bullet.Get_Mask_Surface(),Player_Bullet.Get_Rect())
                             pygame.draw.rect(self.Display,(255,255,0,255),Player_Bullet.Get_Rect())
+                            self.Display.blit(Player_Bullet.Get_Mask_Surface(),Player_Bullet.Get_Rect())
                     else:
                         self.Player.Bullet.remove(Player_Bullet)
                         self.Player.Is_Shooting = False
@@ -198,8 +214,10 @@ class Game(Display_Interface):
         self.Display.blit(self.Player.Get_Image(),self.Player.Get_Pos())
         #get masque du joueur
         if(self.Debug):
+            pygame.draw.rect(self.Display,(255,255,0,255),self.Player.Get_Rect())
             self.Display.blit(self.Player.Get_Mask_Surface(),self.Player.Get_Pos())
 
         #for time event and flip
         self.milliseconds_since_event += pygame.time.Clock().tick(self.frames_per_second)
+        self.milliseconds_since_event_shooter +=  pygame.time.Clock().tick(self.frames_per_second)
         pygame.display.flip()

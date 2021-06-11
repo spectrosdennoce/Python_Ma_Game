@@ -26,7 +26,7 @@ class Display_Interface:
             }
             self.Write_all_Config('Klavier',self.TOUCHE)
         #init display
-        self.Debug = False
+        self.Debug = True
         self.Running = True
         try:
             Screen_config = self.get_Config('Ecran')
@@ -42,7 +42,7 @@ class Display_Interface:
         self.Icon = pygame.display.set_icon(Icon)
         self.Name = pygame.display.set_caption("Tempo of the psycho")
         #init fps
-        self.frames_per_second = 60
+        self.frames_per_second = 120
         #get sound information (all is between 0 and 100)
         try:
             Audio_config = self.get_Config('Music')
