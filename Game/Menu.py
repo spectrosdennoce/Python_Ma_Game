@@ -14,10 +14,12 @@ class Menu(Display_Interface):
             height_ground = self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/4
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     exit()
                 if event.type == pygame.KEYDOWN:
                     keys = pygame.key.get_pressed()
                     if keys[getattr(pygame, "K_"+self.TOUCHE["escape"])]:
+                        pygame.quit()
                         exit()
                     if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Level[0].Etat != 0):
                         self.Level[0].Etat = self.Level[0].Etat-1
@@ -27,8 +29,10 @@ class Menu(Display_Interface):
                         if self.Level[0].Etat == 0:
                             self.Running = False
                         elif self.Level[0].Etat == 1:
+                            pygame.quit()
                             exit()
                         elif self.Level[0].Etat == 2:
+                            pygame.quit()
                             exit()
     def Update(self):
         self.Display.fill((0,0,0))

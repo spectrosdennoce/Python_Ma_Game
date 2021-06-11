@@ -61,10 +61,12 @@ class Game(Display_Interface):
     def HandleEvent(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.quit()
                 exit()
         keys = pygame.key.get_pressed()
         if keys[getattr(pygame, "K_"+self.TOUCHE["escape"])]:
-                exit()
+            pygame.quit()
+            exit()
 
         if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Is_Jump == False):
             self.Player.Is_Away_Jump = True
@@ -157,6 +159,7 @@ class Game(Display_Interface):
 
 #--------------------------------------------------------------------------------------
         if(self.Player.Vie == 0):
+            pygame.quit()
             exit()
         for Enemy_unique in self.Enemy:
             if(Enemy_unique.Pos_X > 0 - Enemy_unique.Size_X):
