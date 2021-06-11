@@ -61,10 +61,10 @@ class Game(Display_Interface):
     def HandleEvent(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.Running = False
+                exit()
         keys = pygame.key.get_pressed()
         if keys[getattr(pygame, "K_"+self.TOUCHE["escape"])]:
-            self.Running = False
+                exit()
 
         if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Is_Jump == False):
             self.Player.Is_Away_Jump = True
@@ -156,7 +156,8 @@ class Game(Display_Interface):
             pygame.draw.rect(self.Display,(255,0,255),pygame.Rect(self.SCREEN_WIDTH-100,self.SCREEN_HEIGHT-100,self.SCREEN_WIDTH,self.SCREEN_HEIGHT))
 
 #--------------------------------------------------------------------------------------
-
+        if(self.Player.Vie == 0):
+            exit()
         for Enemy_unique in self.Enemy:
             if(Enemy_unique.Pos_X > 0 - Enemy_unique.Size_X):
                 Enemy_unique.Pos_X -= Enemy_unique.Vitesse
@@ -189,6 +190,7 @@ class Game(Display_Interface):
                     if Player_Bullet.IS_Overlaps(Enemy_unique):
                         self.Player.Bullet.remove(Player_Bullet)
                         self.Player.Is_Shooting = False
+                        #erreur de cible les entité ne sont pas identifier correctemement 
                         Enemy_unique.Vie = Enemy_unique.Vie - Player_Bullet.Degat
                         if(self.Debug):
                             print('player bullet collide enemy' + " : " +  str(Enemy_unique.Vie))
