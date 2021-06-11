@@ -13,7 +13,6 @@ class Display_Interface:
         #init controler
         try:
             self.TOUCHE = self.get_Config('Klavier')
-            print(self.TOUCHE)
         except:
             print('cannot open Klvaier')
             self.TOUCHE = {
@@ -25,7 +24,6 @@ class Display_Interface:
             'escape':'ESCAPE',
             'enter':'RETURN'
             }
-            print(self.TOUCHE)
             self.Write_all_Config('Klavier',self.TOUCHE)
         #init display
         self.Debug = False

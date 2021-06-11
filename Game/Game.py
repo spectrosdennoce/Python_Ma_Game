@@ -1,3 +1,4 @@
+from copy import copy
 from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level,glob
 import random
 from Libs.Read_Raw import raw,Get_All_From_Folder
@@ -29,13 +30,15 @@ class Game(Display_Interface):
         self.Player = Personnage(Image=Image_Player,Game=self,Position_Bullet_X=80,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx))
     #init spawner
         self.Spawner = (self.SCREEN_WIDTH-100,self.SCREEN_HEIGHT-350)
+        self.Timer_Spawner = 1500
     #init enemy
         self.Enemy_Type = [
             Enemy(Image=Image_Mob1,Game=self,Vie=2,Position_Bullet_X=0,Position_Bullet_Y=40,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.Spawner[0],Pos_Y=self.Spawner[1]),
-            Enemy(Image=Image_Mob2,Position_Bullet_X=0,Vie=2,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.SCREEN_WIDTH/2-self.SCREEN_WIDTH/3,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/3),
-            Enemy(Image=Image_Mob3,Position_Bullet_X=0,Vie=2,Position_Bullet_Y=89,Game=self,Shoot_Entity=Bullet(Image_Laser,self,Sfx),Pos_X=self.SCREEN_WIDTH-self.SCREEN_WIDTH/2,Pos_Y=self.SCREEN_HEIGHT-self.SCREEN_HEIGHT/2)
+            Enemy(Image=Image_Mob2,Position_Bullet_X=0,Vie=2,Position_Bullet_Y=20,Game=self,Shoot_Entity=Bullet(Image_Bullet,self,Sfx,Reverse=True),Pos_X=self.Spawner[0],Pos_Y=self.Spawner[1]),
+            Enemy(Image=Image_Mob3,Position_Bullet_X=0,Vie=2,Position_Bullet_Y=89,Game=self,Shoot_Entity=Bullet(Image_Laser,self,Sfx),Pos_X=self.Spawner[0],Pos_Y=self.Spawner[1])
         ]
-        self.Enemy = [self.Enemy_Type[0],self.Enemy_Type[1],self.Enemy_Type[2]]
+        
+        self.Enemy = [copy(self.Enemy_Type[0])]
 
     #init Level
         self.Level_Right = Level(Image_Bg_Lvl1,self,-self.SCREEN_WIDTH)
@@ -52,6 +55,8 @@ class Game(Display_Interface):
         self.milliseconds_until_event = self.Rythme
         self.milliseconds_since_event = 0
         self.milliseconds_since_event_shooter = 0
+        self.milliseconds_since_event_hit = 0
+        self.milliseconds_since_event_spawner = 0
     #init Controler
     def HandleEvent(self):
         for event in pygame.event.get():
@@ -63,7 +68,7 @@ class Game(Display_Interface):
 
         if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Is_Jump == False):
             self.Player.Is_Away_Jump = True
-
+        # a coder et animer une fonction accroupire (vu que les collision perfect frame sa abaissera la boitre de collision)
         # if keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y < self.SCREEN_HEIGHT):
         #     self.Player.Pos_Y += self.Player.Vitesse
         # elif keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y > self.SCREEN_HEIGHT):
@@ -84,6 +89,18 @@ class Game(Display_Interface):
     #init Rythme_based
     def Rythme_fonc(self):
         
+        #a automatiser pour faire n type de mob
+        if (self.milliseconds_since_event_spawner >= ((self.milliseconds_until_event-self.BPM)%self.Timer_Spawner)):
+            self.milliseconds_since_event_spawner = 0
+            if(len(self.Enemy) < 3):
+                randomized_mod = random.randint(1,3)
+                if randomized_mod == 1:
+                    self.Enemy.append(copy(self.Enemy_Type[0]))
+                elif randomized_mod == 2:
+                    self.Enemy.append(copy(self.Enemy_Type[1]))
+                elif randomized_mod == 3:
+                    self.Enemy.append(copy(self.Enemy_Type[2]))
+
         if ((self.milliseconds_since_event >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Jump)) & (self.Player.Is_Away_Jump == True)):
             self.milliseconds_since_event = 0
             self.Player.Animate(4,12,True,lambda:self.Player.Set_Jump())
@@ -94,29 +111,26 @@ class Game(Display_Interface):
                 self.Player.Animate(12,24,False)
                 self.Player.Is_Move = False
 
+        if (self.milliseconds_since_event_hit >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Can_Hit)):
+            self.milliseconds_since_event_hit = 0
+            self.Player.Is_Hit = False
+
         if ((self.milliseconds_since_event_shooter >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Shoot)) & (self.Player.Is_Away_Shot == True) & (self.Player.Has_Shoot == False)):
             self.milliseconds_since_event_shooter = 0
             self.Player.Animate(1,3,True,lambda:self.Player.Shoot())
             self.Has_Shoot = True
             if(self.Player.Etat == 0):
                 self.Player.Is_Away_Shot = False
-            
             self.Player.Is_Action = False
-            # for Enemy_unique in self.Enemy:
-            #     if(Enemy_unique.Can_Shoot == True):
-            #         #Enemy_unique.Shoot()
-            #         Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
         
         for Enemy_unique in self.Enemy:
             if ((self.milliseconds_since_event_shooter >= ((self.milliseconds_until_event-self.BPM)%self.Player.Speed_Shoot)) & (Enemy_unique.Is_Away_Shot == True) & (Enemy_unique.Has_Shoot == False)):
-                        self.milliseconds_since_event_shooter = 0
-                        Enemy_unique.Animate(1,len(Enemy_unique.Image),False,lambda:Enemy_unique.Shoot())
-                        self.Has_Shoot = True
-                        if(Enemy_unique.Etat == 0):
-                            Enemy_unique.Is_Away_Shot = False
-                        
-                        Enemy_unique.Is_Action = False
-
+                self.milliseconds_since_event_shooter = 0
+                Enemy_unique.Animate(0,len(Enemy_unique.Image)-2,False,lambda:Enemy_unique.Shoot())
+                self.Has_Shoot = True
+                if(Enemy_unique.Etat == 0):
+                    Enemy_unique.Is_Away_Shot = False
+                Enemy_unique.Is_Action = False
 
         if (self.milliseconds_since_event_shooter >= self.milliseconds_until_event-self.BPM):
             self.Player.Is_Action = True
@@ -144,17 +158,18 @@ class Game(Display_Interface):
 #--------------------------------------------------------------------------------------
 
         for Enemy_unique in self.Enemy:
-            if(len(self.Enemy) < 4):
-                randomized_mod = random.randint(1,3)
-                if randomized_mod == 1:
-                    self.Enemy.append(self.Enemy_Type[0])
-                elif randomized_mod == 2:
-                    self.Enemy.append(self.Enemy_Type[1])
-                elif randomized_mod == 3:
-                    self.Enemy.append(self.Enemy_Type[2])
+            if(Enemy_unique.Pos_X > 0 - Enemy_unique.Size_X):
+                Enemy_unique.Pos_X -= Enemy_unique.Vitesse
+            else:
+                self.Enemy.remove(Enemy_unique)
             if self.Player.IS_Overlaps(Enemy_unique):
-                print('Player collide enemy!' + " : " +  str(Enemy_unique.Vie))
-            
+                if(self.Player.Is_Hit == False):
+                    self.Player.Vie -= Enemy_unique.Degat
+                    self.Player.Is_Hit = True
+                if(self.Debug):
+                    print('Player collide enemy!' + " : " +  str(Enemy_unique.Vie))
+            if(self.Debug):
+                print(len(self.Enemy))
 #--------------------------------------------------------------------------------------
 
             #shoot enemy collider
@@ -233,6 +248,8 @@ class Game(Display_Interface):
 
         #get image du joueur
         self.Display.blit(self.Player.Get_Image(),self.Player.Get_Pos())
+        #get life player
+        self.Player.print_life()
         #get masque du joueur
         if(self.Debug):
             pygame.draw.rect(self.Display,(255,255,0,255),self.Player.Get_Rect())
@@ -241,4 +258,6 @@ class Game(Display_Interface):
         #for time event and flip
         self.milliseconds_since_event += pygame.time.Clock().tick(self.frames_per_second)
         self.milliseconds_since_event_shooter +=  pygame.time.Clock().tick(self.frames_per_second)
+        self.milliseconds_since_event_hit +=  pygame.time.Clock().tick(self.frames_per_second)
+        self.milliseconds_since_event_spawner  +=  pygame.time.Clock().tick(self.frames_per_second)
         pygame.display.flip()

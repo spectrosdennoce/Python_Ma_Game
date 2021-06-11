@@ -2,7 +2,7 @@ import pygame
 import copy
 from Libs.Sprite import Sprite
 class Entity():
-    def __init__(self,Image,Game,Reverse=False,Shoot_Entity=None,Position_Bullet_X=None,Position_Bullet_Y=None,Size_X=100,Size_Y=200,Pos_X=250,Pos_Y=250,Vitesse=10,Can_Shoot=False,Vie=3):
+    def __init__(self,Image,Game,Reverse=False,Shoot_Entity=None,Position_Bullet_X=None,Position_Bullet_Y=None,Size_X=100,Size_Y=200,Pos_X=250,Pos_Y=250,Vitesse=5,Degat=1,Can_Shoot=False,Vie=3):
         self.Game = Game
         self.Size_Y = Size_Y
         self.Size_X = Size_X
@@ -25,9 +25,12 @@ class Entity():
         self.Is_Action = False
         self.Is_Shooting = False
         self.Is_Animate = False
+        self.Is_Hit = False
+        self.Speed_Can_Hit = 500
         self.Animation_Reverse = False
         self.Is_Away_Shot = False
         self.Has_Shoot = False
+        self.Degat = Degat
         self.frames = 0
         self.Speed_Shoot = 100
         self.Speed_Jump = 155
