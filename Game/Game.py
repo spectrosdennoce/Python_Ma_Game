@@ -1,6 +1,6 @@
 from copy import copy
 from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level,glob
-import random
+import random,sys
 from Libs.Read_Raw import raw,Get_All_From_Folder
 from Entity.Personage import Personnage
 from Entity.Enemy import Enemy
@@ -61,12 +61,10 @@ class Game(Display_Interface):
     def HandleEvent(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                sys.exit()
         keys = pygame.key.get_pressed()
         if keys[getattr(pygame, "K_"+self.TOUCHE["escape"])]:
-            pygame.quit()
-            exit()
+            sys.exit()
 
         if keys[getattr(pygame, "K_"+self.TOUCHE["haut"])] & (self.Player.Is_Jump == False):
             self.Player.Is_Away_Jump = True
@@ -159,8 +157,7 @@ class Game(Display_Interface):
 
 #--------------------------------------------------------------------------------------
         if(self.Player.Vie == 0):
-            pygame.quit()
-            exit()
+            sys.exit()
         for Enemy_unique in self.Enemy:
             if(Enemy_unique.Pos_X > 0 - Enemy_unique.Size_X):
                 Enemy_unique.Pos_X -= Enemy_unique.Vitesse

@@ -1,4 +1,4 @@
-import pygame
+import pygame,sys
 from Game.Game import Game
 from Game.Menu import Menu
 
@@ -14,8 +14,7 @@ while game_object.Running:
     game_object.HandleEvent()
     game_object.Rythme_fonc()
     game_object.Update()
-pygame.quit()
-exit()
+sys.exit()
 
 
 
