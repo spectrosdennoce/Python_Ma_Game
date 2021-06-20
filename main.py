@@ -12,7 +12,8 @@ while menu_object.Running:
 game_object = Game()
 while game_object.Running:
     game_object.HandleEvent()
-    game_object.Rythme_fonc()
+    if(game_object.Pause == False):
+        game_object.Rythme_fonc()
     game_object.Update()
 sys.exit()
 

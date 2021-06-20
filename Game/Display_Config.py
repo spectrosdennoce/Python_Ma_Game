@@ -8,6 +8,8 @@ class Display_Interface:
         #music
         mixer.pre_init(44100, -16, 2, 2048)
         mixer.init()
+        #font
+        pygame.font.init()
         #icon
         Icon = pygame.image.load(r"./Image/icon.png")
         #init controler
@@ -20,6 +22,10 @@ class Display_Interface:
             'bas':'s',
             'gauche':'q',
             'droite':'d',
+            'second_fire':'f',
+            'grenade':'g',
+            'reset':'r',
+            'pause':'p',
             'space':'SPACE',
             'escape':'ESCAPE',
             'enter':'RETURN'
@@ -54,6 +60,14 @@ class Display_Interface:
             self.SFX_Volume = 0.1
             self.Write_Config('Music','Music_Volume',int(self.Music_Volume*100))
             self.Write_Config('Music','SFX_Volume',int(self.SFX_Volume*100))
+        
+    def Write_Text(self,Pos,Color,Text,Font = 'Georgia',SizeFont = 30):
+        Font = pygame.font.SysFont(Font, SizeFont)
+        Text_Surface = Font.render(Text, False, Color)
+        Text_Rect = Text_Surface.get_rect()
+        x,y = Pos
+        Text_Rect.center = (x,y)
+        self.Display.blit(Text_Surface,Text_Rect)
 
     def get_Config(self,section):
         config = ConfigParser()

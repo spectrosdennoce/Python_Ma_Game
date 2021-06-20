@@ -6,7 +6,7 @@ class Personnage(Entity):
         #bullet
         Position_Bullet_X=Position_Bullet_X,Position_Bullet_Y=Position_Bullet_Y,Can_Shoot=True,Shoot_Entity=Shoot_Entity,
         #information
-        Vie=10,Pos_X=Game.SCREEN_WIDTH/2,Vitesse = 7,Pos_Y=Game.SCREEN_HEIGHT-300)
+        Vie=1,Pos_X=Game.SCREEN_WIDTH/2,Vitesse = 7,Pos_Y=Game.SCREEN_HEIGHT-300)
         self.Level = 0
         self.Is_Jump = False
         self.Is_Away_Jump = False
@@ -24,7 +24,7 @@ class Personnage(Entity):
                 self.Is_Jump = False
                 self.Is_Away_Jump = False
                 self.Jump_Heigth = self.Jump_Heigth_Init
-        if self.Is_Animate == False:
+        if self.Is_Jump == False:
             self.Etat=0
     def Set_Jump(self):
         self.Is_Jump = True

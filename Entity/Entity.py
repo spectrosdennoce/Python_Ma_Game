@@ -29,12 +29,13 @@ class Entity():
         self.Speed_Can_Hit = 500
         self.Animation_Reverse = False
         self.Is_Away_Shot = False
+        self.Is_Away_Shot_laser = False
         self.Has_Shoot = False
         self.Degat = Degat
         self.frames = 0
         self.Speed_Shoot = 100
-        self.Speed_Jump = 155
-        self.Speed_Move = 155
+        self.Speed_Jump = 10
+        self.Speed_Move = 20
         self.Is_Move = False
         self.Max_Vie = Vie
         self.Vie = Vie
@@ -43,13 +44,13 @@ class Entity():
         self.Bullet = []
         self.Position_Bullet_Y = Position_Bullet_Y
         self.Position_Bullet_X = Position_Bullet_X
+        
     #premiere image, derniere image,si l'animation apres l'action ce rejoue a l'envers, la fonction apres avoir atteint la derniere image
     def Animate(self,Min_Plage,Max_Plage,Reverse = False,function_unleash = None):
         
         if(self.Has_Shoot == False):
             self.Is_Animate = True
-        
-        if ((self.Animation_Reverse == False) & (self.Etat+Min_Plage > Max_Plage+1)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
+        if ((self.Animation_Reverse == False) & (self.Etat > Max_Plage-1)) | ((self.Animation_Reverse == True) & (self.Etat <= Min_Plage)):
             self.Etat = 0
             self.Is_Animate = False
             self.Animation_Reverse = False
@@ -57,16 +58,14 @@ class Entity():
             print("Is_Animate : " + str(self.Is_Animate))
         if(self.Is_Animate):
             if((self.Etat == 0) & (self.Animation_Reverse == False)):
-                self.Etat = Min_Plage
-            if(self.Etat+Min_Plage > Max_Plage):
-                if(function_unleash):
-                    function_unleash()
-            if(self.Etat+Min_Plage <= Max_Plage+1) & (self.Animation_Reverse == False):
-                if(self.Etat+Min_Plage == Max_Plage):
-                    self.Animation_Reverse = Reverse
+                self.Etat = Min_Plage-1
+            if(self.Etat < Max_Plage-1) & (self.Animation_Reverse == False):
                 self.Etat += 1
             elif (self.Etat > Min_Plage) & (self.Animation_Reverse == True):
                 self.Etat -= 1
+            elif((self.Etat == Max_Plage-1) & (function_unleash is not None)):
+                function_unleash()
+                self.Animation_Reverse = Reverse
         if(self.Game.Debug == True):
             print("Etat : " + str(self.Etat))
     
@@ -98,6 +97,9 @@ class Entity():
                 self.Shoot_Entity.Reverse = False
         self.Get_Sprite().Refresh_Sprite(x,self)
         return x
+
+    def Reset_Etat(self):
+        self.Etat = 0
 
     def Goto_Left(self):
         self.Reverse = True
