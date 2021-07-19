@@ -25,7 +25,6 @@ class Level:
         return len(self.Image_Level)
     def Get_Rect(self):
         return self.Get_Sprite().rect
-
     def Get_Mask(self):
         return self.Get_Sprite().mask
 

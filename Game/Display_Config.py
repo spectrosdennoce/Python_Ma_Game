@@ -88,6 +88,7 @@ class Display_Interface:
             config.set(str(section), str(line), str(value))
         with open('Config.ini', 'w') as configfile:
             config.write(configfile)
+
     def Write_all_Config(self,section,dict_value):
         for key in dict_value:
             self.Write_Config(section,key,dict_value[key])

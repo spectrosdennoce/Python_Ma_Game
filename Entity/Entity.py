@@ -82,6 +82,9 @@ class Entity():
         except:
             if(self.Game.Debug):
                 print("sound bugged")
+        self.Shoot_Entity.Trajectoire = 1
+        self.Bullet.append(copy.copy(self.Shoot_Entity))
+        self.Shoot_Entity.Trajectoire = -1
         self.Bullet.append(copy.copy(self.Shoot_Entity))
 
     def Get_Image(self):
@@ -140,4 +143,8 @@ class Entity():
     
     def IS_Overlaps(self,other):
         return (self.Get_Mask().overlap(other.Get_Mask(),self.Get_Offset(other)))
-        
+    def Get_Shoot_Point(self):
+        if(self.Reverse):
+            return (self.Pos_X,self.Pos_Y+ self.Position_Bullet_Y)
+        else:
+            return (self.Pos_X + self.Position_Bullet_X,self.Pos_Y  + self.Position_Bullet_Y )

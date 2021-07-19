@@ -1,6 +1,7 @@
 from copy import copy, deepcopy
+from os import removedirs
 from Game.Display_Config import Display_Interface,pygame,ConfigParser,mixer,Level,glob
-import random,sys
+import random,sys,math
 from Libs.Read_Raw import raw,Get_All_From_Folder
 from Entity.Personage import Personnage
 from Entity.Enemy import Enemy
@@ -9,10 +10,9 @@ class Game(Display_Interface):
     def __init__(self):
         super().__init__()
 
-
     #get_Ressource
         ##get_image
-        self.Image = { 
+        self.Image = {
             'Image_Bg_Lvl1' : Get_All_From_Folder("./Image/Background/",".png"),
             'Image_Player' : Get_All_From_Folder("./Image/Player/",".png"),
             'Image_Bullet' : Get_All_From_Folder("./Image/Bullet/Bullet/",".png"),
@@ -21,13 +21,15 @@ class Game(Display_Interface):
             'Image_Mob2' : Get_All_From_Folder("./Image/Mob/TrucWip/",".png"),
             'Image_Mob3' : Get_All_From_Folder("./Image/Mob/Ship/",".png")
         }
+        # self.Object = {
+        #     'Level_1': Get_All_From_Folder("./Image/Object/Level1",".png")
+        # }
         ##get_sound
-        self.Sound = { 
+        self.Sound = {
             'Music' : [raw("./Music/songamu1.mp3")],
             'Sfx' : raw("./sfx/gun.wav"),
             'Game_Over' : raw("./sfx/Game_over.wav")
         }
-
     #init var pause
         self.Pause = False
     #init player
@@ -55,6 +57,7 @@ class Game(Display_Interface):
         self.milliseconds_since_event_shooter = 0
         self.milliseconds_since_event_hit = 0
         self.milliseconds_since_event_spawner = 0
+
     def Create_Enemy(self,Number):
         if(Number == 0):
             x = Enemy(Image=self.Image['Image_Mob1'],Game=self,Vie=2,Position_Bullet_X=0,Position_Bullet_Y=40,Shoot_Entity=Bullet(self.Image['Image_Bullet'],self,self.Sound['Sfx'],Reverse=True),Pos_X=self.Spawner[0],Pos_Y=self.Spawner[1])
@@ -63,6 +66,7 @@ class Game(Display_Interface):
         elif(Number == 2):
             x = Enemy(Image=self.Image['Image_Mob3'],Position_Bullet_X=0,Vie=2,Position_Bullet_Y=89,Game=self,Shoot_Entity=Bullet(self.Image['Image_Bullet'],self,self.Sound['Sfx']),Pos_X=self.Spawner[0],Pos_Y=self.Spawner[1])
         return x
+        
     #init Controler
     def HandleEvent(self):
         for event in pygame.event.get():
@@ -88,11 +92,11 @@ class Game(Display_Interface):
         # elif keys[getattr(pygame, "K_"+self.TOUCHE["bas"])] & (self.Player.Pos_Y+self.Player.Size_Y > self.SCREEN_HEIGHT):
         #     self.Player.Pos_Y = self.SCREEN_HEIGHT-self.Player.Size_Y
 
-        if (keys[getattr(pygame, "K_"+self.TOUCHE["droite"])]) & (self.Player.Is_Shooting == False) & ((self.Player.Is_Away_Shot == False) & (self.Pause == False)):
+        if (keys[getattr(pygame, "K_"+self.TOUCHE["droite"])]) & ((self.Player.Is_Away_Shot == False) & (self.Pause == False)):
             self.Player.Is_Move = True
             self.Player.Goto_Right()
 
-        if (keys[getattr(pygame, "K_"+self.TOUCHE["gauche"])]) & (self.Player.Is_Shooting == False) & ((self.Player.Is_Away_Shot == False) & (self.Pause == False)):
+        if (keys[getattr(pygame, "K_"+self.TOUCHE["gauche"])]) & ((self.Player.Is_Away_Shot == False) & (self.Pause == False)):
             self.Player.Is_Move = True
             self.Player.Goto_Left()
 
@@ -106,6 +110,12 @@ class Game(Display_Interface):
 
         if ((keys[getattr(pygame, "K_"+self.TOUCHE["reset"])]) & (self.Player.Vie == 0)):
             self.reset()
+            
+        if (keys[getattr(pygame, "K_l")]):
+            if(self.Debug == True):
+                self.Debug = False
+            else:
+                self.Debug = True
 
     def reset(self):
         self.__init__()
@@ -162,9 +172,9 @@ class Game(Display_Interface):
                 self.Player.Is_Action = False
             self.milliseconds_until_event = self.Rythme
 
-
     #init Update
     def Update(self):
+        self.Player.Shoot_Entity.Etat = (self.Player.Shoot_Entity.Etat+1)%3
         #init black background
         self.Display.fill((0,0,0))
         #set image fonction level
@@ -173,7 +183,9 @@ class Game(Display_Interface):
         if ((self.milliseconds_since_event_shooter >= self.milliseconds_until_event-self.BPM)):
             pygame.draw.rect(self.Display,(255,0,255),pygame.Rect(self.SCREEN_WIDTH-100,self.SCREEN_HEIGHT-100,self.SCREEN_WIDTH,self.SCREEN_HEIGHT))
 
+
 #--------------------------------------------------------------------------------------
+
         for Enemy_unique in self.Enemy:
             if(self.Pause == False):
                 if(Enemy_unique.Pos_X > 0 - Enemy_unique.Size_X):
@@ -188,6 +200,7 @@ class Game(Display_Interface):
                         print('Player collide enemy!' + " : " +  str(Enemy_unique.Vie))
             if(self.Debug):
                 print(len(self.Enemy))
+
 #--------------------------------------------------------------------------------------
 
             #shoot enemy collider
@@ -234,6 +247,7 @@ class Game(Display_Interface):
                             Enemy_unique.Bullet.remove(Enemy_Bullet)
 
 #--------------------------------------------------------------------------------------
+
         #check jump player
         if(self.Pause == False):
             if(self.Player.Is_Jump == True):
@@ -246,7 +260,7 @@ class Game(Display_Interface):
                     if(Player_Bullet.Reverse == False):
                         #show player bullet image
                         if (Player_Bullet.Pos_X < self.SCREEN_WIDTH):
-                            Player_Bullet.Pos_X += Player_Bullet.Vitesse
+                            Player_Bullet.right(self.Player)
                             self.Display.blit(Player_Bullet.Get_Image(),Player_Bullet.Get_Pos())
                             #show player bullet masque
                             if(self.Debug):
@@ -258,7 +272,7 @@ class Game(Display_Interface):
                     else:
                         #show player bullet image
                         if (Player_Bullet.Pos_X > 0):
-                            Player_Bullet.Pos_X -= Player_Bullet.Vitesse
+                            Player_Bullet.left(self.Player)
                             self.Display.blit(Player_Bullet.Get_Image(),Player_Bullet.Get_Rect())
                             #show  player bullet masque
                             if(self.Debug):
@@ -272,6 +286,30 @@ class Game(Display_Interface):
 
         #get image du joueur
         self.Display.blit(self.Player.Get_Image(),self.Player.Get_Pos())
+        #get line shoot
+
+        plotPoints = []
+        for x in range(self.Player.Get_Shoot_Point()[0], self.SCREEN_WIDTH):
+            y=int(math.sin((x-self.Player.Get_Shoot_Point()[0])/50.0) * 100 + self.Player.Get_Shoot_Point()[1])
+            plotPoints.append([x, y])
+        if(plotPoints):
+            pygame.draw.lines(self.Display, (0,255,0,255), False, plotPoints, 1)
+        plotPoints = []
+        for x in range(self.Player.Get_Shoot_Point()[0], self.SCREEN_WIDTH):
+            y=int(-math.sin((x-self.Player.Get_Shoot_Point()[0])/50.0) * 100 + self.Player.Get_Shoot_Point()[1])
+            plotPoints.append([x, y])
+        if(plotPoints):
+            pygame.draw.lines(self.Display, (0,255,0,255), False, plotPoints, 1)
+            pygame.draw.line(self.Display,(0,255,0,255),self.Player.Get_Shoot_Point(),(self.SCREEN_WIDTH,self.Player.Get_Shoot_Point()[1]))
+
+        plotPoints = []
+        for x in range(0, self.Player.Get_Shoot_Point()[0]):
+            y=int(math.sin((x-self.Player.Get_Shoot_Point()[0])/50.0) * 100 + self.Player.Get_Shoot_Point()[1])
+            plotPoints.append([x, y])
+        if(plotPoints):
+            pygame.draw.lines(self.Display, (0,0,255,255), False, plotPoints, 1)
+            pygame.draw.line(self.Display,(0,0,255,255),self.Player.Get_Shoot_Point(),(0,self.Player.Get_Shoot_Point()[1]))
+
         #get life player
         self.Player.print_life()
         #get masque du joueur
